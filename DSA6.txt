@@ -1,146 +1,229 @@
-/* 
-There are flight paths between cities. If there is a flight between city A 
-and city B, then there is an edge between the cities. The cost of the 
-edge can be the time that the flight takes to reach city B from A, or the 
-amount of fuel used for the journey. Represent this as a graph. The 
-node can be represented by the airport name or name of the city. Use 
-adjacency list representation of the graph or use adjacency matrix 
-representation of the graph. 
-*/
+#include<iostream>
+#include<stack>
+#include<queue>
+using namespace std;
 
-#include<iostream> 
-#include<string.h> 
-using namespace std; 
-
-class flight 
-{ 
-public: 
-    int am[10][10]; 
-    char city_index[10][10]; 
-
-    flight(); 
-    int create(); 
-    void display(int city_count); 
+class graphnode
+{
+	public:
+		int vertex;
+		graphnode *next;
+		graphnode()
+		{
+			vertex=-1;
+			next=NULL;
+		}
+	
 };
+class graph
+{
+	public:
+	graphnode *head[20];
+	int no;
+	int Amatrix[10][10];
+	int visited[10];
+	
+	int create()
+	{
+		cout<<"\nHow many nodes do you want to insert ";
+		int num=0;
+		cin>>num;
+		int vi=0,vj=0;
+		for(int i=0;i<num;i++)
+		{
+			head[i]=new graphnode();
+		}
+		for(int i=0;i<num;i++)
+		{
+			cout<<"\nEnter your vertex: ";
+			cin>>head[i]->vertex;
+		}
+		while(1)
+		{
+			cout<<"\nEnter the edge between (u,v): ";
+			cin>>vi>>vj;
+			insertlist(vi,vj,num);
+			insertlist(vj,vi,num);
+			cout<<"do you want to enter more y/n?";
+			  char ch;
+			  cin>>ch;
+			  if(ch=='n')
+			  {
+			  	break;
+				  }	
+			
+		}
+		return num;
 
-flight::flight() 
-{ 
-    int i,j; 
-    for(i=0;i<10;i++) 
-    { 
-        strcpy(city_index[i],"xx"); 
-    } 
-    for(i=0;i<10;i++) 
-    { 
-        for(j=0;j<10;j++) 
-        { 
-            am[i][j]=0; 
-        } 
-    } 
-}
-
-int flight::create() 
-{ 
-    int city_count=0,j,si,di,wt; 
-    char s[10],d[10],c; 
-    do 
-    { 
-        cout<<"\n\tEnter Source City : "; 
-        cin>>s; 
-        cout<<"\n\tEnter Destination City : "; 
-        cin>>d; 
-        for(j=0;j<10;j++) 
-        { 
-            if(strcmp(city_index[j],s)==0) 
-                break; 
-        } 
-
-        if(j==10) 
-        { 
-            strcpy(city_index[city_count],s); 
-            city_count++; 
-        } 
-
-        for(j=0;j<10;j++) 
-        { 
-            if(strcmp(city_index[j],d)==0) 
-                break; 
-        } 
-
-        if(j==10) 
-        { 
-            strcpy(city_index[city_count],d); 
-            city_count++; 
-        } 
-
-        cout<<"\n\tEnter Distance From "<<s<<" And "<<d<<": "; 
-        cin>>wt; 
-
-        for(j=0;j<10;j++) 
-        { 
-            if(strcmp(city_index[j],s)==0) 
-                si=j; 
-            if(strcmp(city_index[j],d)==0) 
-                di=j; 
-        } 
-        am[si][di]=wt; 
-
-        cout<<"\n\tDo you want to add more cities? (y/n) : "; 
-        cin>>c; 
-    } while(c=='y'||c=='Y'); 
-
-    return city_count; 
-}
-
-void flight::display(int city_count) 
-{ 
-    int i,j; 
-    cout<<"\n\tDisplaying Adjacency Matrix:\n\n\t"; 
-
-    for(i=0;i<city_count;i++) 
-        cout<<"\t"<<city_index[i]; 
-
-    cout<<"\n"; 
-
-    for(i=0;i<city_count;i++) 
-    { 
-        cout<<"\t"<<city_index[i]; 
-        for(j=0;j<city_count;j++) 
-        { 
-            cout<<"\t"<<am[i][j]; 
-        } 
-        cout<<"\n"; 
-    } 
-}
-
-int main() 
-{ 
-    flight f; 
-    int n,city_count; 
-    char c; 
-
-    while(1) 
-    { 
-        cout<<"\n\t***** Flight Main Menu *****"; 
-        cout<<"\n\t1. Create \n\t2. Adjacency Matrix\n\t3. Exit"; 
-        cout<<"\n\n\tEnter your choice : "; 
-        cin>>n; 
-
-        switch(n) 
-        { 
-            case 1: 
-                city_count = f.create(); 
-                break; 
-
-            case 2: 
-                f.display(city_count); 
-                break; 
-
-            case 3: 
-                cout<<"\nThanks for using this Program!\n"; 
-                return 0; 
-        } 
-    } 
-
-    return 0; 
+	}
+	void insertlist(int vi,int vj,int n)
+	{
+		graphnode *temp,*newnode;
+		newnode=new graphnode();
+		newnode->vertex=vj;
+		newnode->next=NULL;
+		for(int i=0;i<n;i++)
+		{
+			if(head[i]->vertex==vi)
+			{
+				if(head[i]->next==NULL)
+				{
+					head[i]->next=newnode;
+				}
+				else
+				{
+					temp=head[i];
+					while(temp->next!=NULL)
+					{
+						temp=temp->next;
+					}
+					temp->next=newnode;
+				}
+			}
+		}
+	}
+	void displayAL(int n)
+	{
+		cout<<" nodes"<<"\t"<<"Adjecent nodes"<<endl;
+		for(int i=0;i<n;i++)
+		{
+			cout<<head[i]->vertex<<"\t";
+			graphnode *temp=head[i];
+			while(temp->next!=NULL)
+			{
+					temp=temp->next;
+				cout<<temp->vertex<<" ";
+			}
+			cout<<"\n";
+		}
+	}
+	int createMatrix()
+	{
+		cout<<"\n Enter number of nodes: ";
+		cin>>no;
+		int vi=0,vj=0;
+		for(int i=0;i<10;i++)
+		{
+			for(int j=0;j<10;j++)
+			{
+				Amatrix[i][j]=0;
+			}
+		}
+		while(1)
+		{
+			cout<<"\nEnter edge between (u,v): ";
+			cin>>vi>>vj;
+			insertAM(vi,vj);
+			insertAM(vj,vi);
+			cout<<"\nDo you want to continue y/n: ";
+			char ch;
+			cin>>ch;
+			if(ch=='n')
+			{
+				break;
+			}
+			
+		}
+		return no;
+	}
+	void insertAM(int vi,int vj)
+	{
+		for(int i=0;i<no;i++)
+		{
+			for(int j=0;j<no;j++)
+			{
+				if(i==vi&&j==vj)
+				{
+					Amatrix[i][j]=1;
+				}
+			}
+		}
+	}
+	void displayAM()
+	{
+		int k=1;
+		cout<<"\n Adjecent Matrix: "<<endl;
+		for(int i=1;i<=no;i++)
+		{
+			if(i==1)
+			{
+				cout<<"\t";
+			}
+			cout<<" "<<i;
+		}
+		cout<<"\n";
+		for(int i=1;i<=no;i++)
+		{
+			cout<<k<<"\t";
+			k++;
+			for(int j=1;j<=no;j++)
+			{
+				cout<<Amatrix[i][j]<<" ";
+			}
+			cout<<"\n";
+		}
+	}
+		void BFS(int start,int n)
+		{
+			bool visited[n+1]={false};
+			queue<int> q;
+			
+			visited[start]=true;
+			q.push(start);
+			
+			while(!q.empty())
+			{
+				int current=q.front();
+				cout<<"  "<<current;
+				q.pop();
+				
+				graphnode *temp=head[current];
+				while(temp!=NULL)
+				{
+					int adjnode=temp->vertex;
+					if(!visited[adjnode])
+					{
+						visited[adjnode]=true;
+						q.push(adjnode);
+					}
+					temp=temp->next;
+				}
+			}
+		}
+		void dfs(int v, int n) {
+		    stack<int> st;
+		   	bool visited[n+1]={false}; // Visited array
+		    st.push(v);
+		    while (!st.empty()) {
+		        int curr = st.top();
+		        st.pop();
+		        if (!visited[curr]) {
+		            cout << curr << " ";
+		            visited[curr] = true;
+		            for (int i = n - 1; i >= 0; i--) {
+		                if (Amatrix[curr][i] && !visited[i]) {
+		                    st.push(i);
+		                }
+		            }
+		        }
+		    }
+		    cout << endl;
+		}
+	
+};
+int main()
+{
+	graph g;
+	int n=g.create();
+	g.displayAL(n);
+	cout<<"enter the node from which you have to traverse :";
+    int start;
+    cin>>start;
+    g.BFS(start,n);
+	int num=g.createMatrix();
+	g.displayAM();
+	cout<<"enter the node from which you have to traverse :";
+    cin>>start;
+    g.dfs(start,num);
+	return 0;
 }
