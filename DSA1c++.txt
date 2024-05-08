@@ -1,92 +1,157 @@
-#include <stdio.h>
-#include <string.h>
 #include <iostream>
+#include <iomanip>
 using namespace std;
-struct node {
-char label[20];
-int ch_count;
-struct node *child[10];
-}*root;
-class GT
-{
+
+#define size 13
+
+class linear_probing {
+    int hash[size], flag[size];
+
 public:
-GT()
-{
-root=NULL;
-}
-void create_tree();
-void display_tree(node *r);
+    linear_probing() {
+        int i;
+        for (i = 0; i < size; i++) {
+            flag[i] = 0;
+        }
+    }
+
+    void insert(int x) {
+        int i, loc;
+        loc = x % size;
+        for (i = 0; i < size; i++) {
+            if (flag[loc] == 0) {
+                hash[loc] = x;
+                flag[loc] = 1;
+                break;
+            }
+            else {
+                loc = (loc + 1) % size;
+            }
+        }
+    }
+
+    void create() {
+        int x, i, n,r;
+        cout << "\nEnter the number of phone numbers to be inserted:\n";
+        cin >> n;
+        cout << "\nEnter the Phone numbers to be inserted in Hash table ->\n";
+        for (i = 0; i < n; i++) {
+            cin >> x;
+            insert(x);
+            r=x;
+        }
+    }
+
+    int find(int x) {
+        int loc = x % size;
+        int i;
+        for (i = 0; i < size; i++) {
+            if (flag[loc] == 1 && hash[loc] == x) {
+                return loc;
+            }
+            else
+                loc = (loc + 1) % size;
+        }
+        return -1;
+    }
+
+    void search() {
+        int x, loc;
+        cout << "\nEnter the phone number to be search:\n";
+        cin >> x;
+        if ((loc = find(x)) == -1)
+            cout << "\nPhone number is not found\n";
+        else
+            cout << "\nPhone number " << x << " is found at " << loc << "th location\n\n";
+    }
+
+    void print() {
+        int i;
+        cout << "\nHash Table is ->"
+             << endl;
+        for (i = 0; i < size; i++) {
+            cout << "(" << i << ") -> ";
+            if (flag[i] == 1) {
+                cout << hash[i] << "\n";
+            }
+            else if (flag[i] == 0)
+                cout << "----\n";
+        }
+    }
 };
-void GT::create_tree()
-{
-int tbooks,tchapters,i,j,k,l;
-root=new node;
-cout<<"Enter name of book: ";
-cin>>root->label;
-cout<<"Enter Number of Chapters: ";
-cin>>root->ch_count;
-tchapters=root->ch_count;
-for(i=0;i<tchapters;i++)
-{
-root->child[i]=new node;
-cout<<"Enter Chapter "<<i+1<<" Name \n";
-cin>>root->child[i]->label;
-cout<<"Enter Number of sections in Chapter "<<root->child[i]->label<<" :\n";
-cin>>root->child[i]->ch_count;
-for(j=0;j<root->child[i]->ch_count;j++)
-{
-root->child[i]->child[j]=new node;
-cout<<"Enter section "<<j+1<<" name :";
-cin>>root->child[i]->child[j]->label;
-}
-}
-}
-void GT::display_tree(node *r1)
-{
-int i,j,k,tchapters;
-if(r1 != NULL)
-{
-cout<<"\n----------Book Hierarchy------------";
-cout<<"\n Book Title: "<<r1->label<<endl;
-tchapters=r1->ch_count;
-for(i=0;i<tchapters;i++)
-{
-cout<<"\n Chapter "<<i+1<<" :";
-cout<<r1->child[i]->label;
-cout<<"\n Sections:\n";
-for(j=0;j<r1->child[i]->ch_count;j++)
-{
-cout<<" "<<r1->child[i]->child[j]->label<<endl;
-}
-}
-}
-}
-int main()
-{
-int choice;
-GT gt;
-while(1)
-{
-cout<<"---------------"<<endl;
-cout<<"Book Tree Creation"<<endl;
-cout<<"---------------"<<endl;
-cout<<"1. Create"<<endl;
-cout<<"2. Display"<<endl;
-cout<<"3. Quit"<<endl;
-cout<<"Enter your choice :";
-cin>>choice;
-switch(choice)
-{
-case 1:
-gt.create_tree();
-break;
-case 2:
-gt.display_tree(root);
-break;
-case 3:
-exit(1);
-default:
-cout<<"Wrong Choice...!!!!"<<endl;
-}
-}
+
+
+struct node {
+    node *next;
+    int phone;
+};
+
+class Chaining {
+    node *hash[size];
+
+public:
+    Chaining() {
+        int i;
+        for (i = 0; i < size; i++)
+            hash[i] = NULL;
+    }
+
+    void create() {
+        int x, n, i;
+        cout << "\nEnter the number of phone numbers to be inserted :\n";
+        cin >> n;
+        cout << "\nEnter the Phone numbers to be inserted in Hash table ->\n";
+        for (i = 0; i < n; i++) {
+            cin >> x;
+            insert(x);
+        }
+    }
+
+    void insert(int key) {
+        int loc = key % size;
+        node *p = new node;
+        p->phone = key;
+        p->next = NULL;
+        if (hash[loc] == NULL) {
+            hash[loc] = p;
+        }
+        else {
+            node *q = hash[loc];
+            while (q->next != NULL) {
+                q = q->next;
+            }
+            q->next = p;
+        }
+    }
+
+    void display() {
+        int i;
+        cout << "\nHash Table is -> :\n";
+        for (i = 0; i < size; i++) {
+            node *q = hash[i];
+            cout << "(" << i << ") -> ";
+            while (q) {
+                cout << q->phone;
+                if (q->next)
+                    cout << " -> ";
+                q = q->next;
+            }
+            cout << "\n";
+        }
+    }
+};
+
+
+int main() {
+    cout << "----------------- Linear Probing -----------------\n";
+    linear_probing lp;
+    lp.create();
+    lp.print();
+    lp.search();
+
+    cout << "\n----------------- Separate Chaining -----------------\n";
+    Chaining h;
+    h.create();
+    h.display();
+    return 0;
 }
